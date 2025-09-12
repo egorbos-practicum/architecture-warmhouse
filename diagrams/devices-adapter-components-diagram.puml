@@ -1,0 +1,35 @@
+@startuml
+!include <C4/C4_Component>
+
+title Диаграмма компонентов DevicesAdapter
+
+Container_Boundary(SmartHome, "SmartHome") {
+    Container(DevicesAdapterContainer, "DevicesAdapter", "C#, ASP.NET Core", "Сервис-адаптер для связи с устройствами")
+    ContainerQueue(PreferencesQueue, "Очередь запросов к устройствам", "Apache Kafka")
+    ContainerQueue(MonitoringQueue, "Очередь записи телеметрии", "Apache Kafka")
+}
+
+Container(DevicesAdapterContainer, "DevicesAdapter") {
+    Boundary(Services, "Application") {
+        Component(DevicesService, "DevicesService", "Service", "Содержит бизнес-логику для управления устройствами")
+        Component(MonitoringService, "MonitoringService", "BackgroundService", "Содержит бизнес-логику для получения от устройств данных телеметрии")
+    }
+
+    Boundary(Infrastructure, "Infrastructure") {
+        Component(PreferencesConsumer, "PreferencesConsumer", "BackgroundService", "Читает события на управление устройствами")
+        Component(MonitoringProducer, "MonitoringProducer", "Service", "Публикует события телеметрии устройств")
+    }
+}
+
+System_Ext(Devices, "Устройства", "Модули управления и умные устройства")
+
+Rel(MonitoringService, MonitoringProducer, "Отправляет данные телеметрии на запись")
+Rel(PreferencesConsumer, DevicesService, "Отправляет запрос на выполнение команд")
+
+Rel(PreferencesConsumer, PreferencesQueue, "Читает события")
+Rel(MonitoringProducer, MonitoringQueue, "Публикует события")
+
+Rel(DevicesService, Devices, "Отправляет команды")
+Rel(Devices, MonitoringService, "Отправляет данные телеметрии")
+
+@enduml

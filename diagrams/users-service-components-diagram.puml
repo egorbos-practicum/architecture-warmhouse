@@ -1,0 +1,45 @@
+@startuml
+!include <C4/C4_Component>
+
+title Диаграмма компонентов UsersService
+
+Container_Boundary(SmartHome, "SmartHome") {
+    Container(UsersServiceContainer, "UsersService", "C#, ASP.NET Core", "Управление пользователями системы")
+    ContainerDb(UsersDatabase, "БД пользователей", "PostgreSQL", "Данные пользователя и данные об авторизации пользователей")
+}
+
+Container(UsersServiceContainer, "UsersService") {
+    Boundary(Controllers, "Presentation") {
+        Component(UsersController, "UsersController", "REST Controller", "Управление учетными записями пользователей")
+        Component(AuthController, "AuthController", "REST Controller", "Аутентификация и авторизация")
+        Component(ProfilesController, "ProfilesController", "REST Controller", "Управление профилями пользователей")
+    }
+
+    Boundary(Services, "Application") {
+        Component(UsersService, "UsersService", "Service", "Содержит бизнес-логику управления учетной записью")
+        Component(AuthService, "AuthService", "Service", "Содержит бизнес-логику авторизации")
+        Component(ProfilesService, "ProfilesService", "Service", "Содержит бизнес-логику управления профилем")
+    }
+
+    Boundary(Contexts, "Persistence") {
+        Component(UsersRepository, "UsersRepository", "EF Core DbContext")
+        Component(AuthRepository, "AuthRepository", "EF Core DbContext")
+        Component(ProfilesRepository, "ProfilesRepository", "EF Core DbContext")
+    }
+}
+
+Rel(UsersController, UsersService, "Вызывает")
+Rel(AuthController, UsersService, "Вызывает")
+Rel(AuthController, AuthService, "Вызывает")
+Rel(ProfilesController, AuthService, "Вызывает")
+Rel(ProfilesController, ProfilesService, "Вызывает")
+
+Rel(UsersService, UsersRepository, "Сохраняет/получает данные")
+Rel(AuthService, AuthRepository, "Сохраняет/получает данные")
+Rel(ProfilesService, ProfilesRepository, "Сохраняет/получает данные")
+
+Rel(UsersRepository, UsersDatabase, "Чтение/запись данных")
+Rel(AuthRepository, UsersDatabase, "Чтение/запись данных")
+Rel(ProfilesRepository, UsersDatabase, "Чтение/запись данных")
+
+@enduml

@@ -82,7 +82,13 @@ _Умный дом_ - это общая предметная область, к�
 
 **Диаграмма компонентов (Components)**
 
-Добавьте диаграмму для каждого из выделенных микросервисов.
+[Диаграмма компонентов UsersService](diagrams/users-service-components-diagram.puml)
+
+[Диаграмма компонентов DevicesService](diagrams/devices-service-components-diagram.puml)
+
+[Диаграмма компонентов MonitoringService](diagrams/monitoring-service-components-diagram.puml)
+
+[Диаграмма компонентов DevicesAdapter](diagrams/devices-adapter-components-diagram.puml)
 
 **Диаграмма кода (Code)**
 

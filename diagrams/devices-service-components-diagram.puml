@@ -1,0 +1,49 @@
+@startuml
+!include <C4/C4_Component>
+
+title Диаграмма компонентов DevicesService
+
+Container_Boundary(SmartHome, "SmartHome") {
+    Container(DevicesServiceContainer, "DevicesService", "C#, ASP.NET Core", "Управление устройствами пользователей, настройка и просмотр состояния")
+    ContainerDb(DevicesDatabase, "БД устройств", "PostgreSQL", "Умные устройства")
+    ContainerQueue(PreferencesQueue, "Очередь запросов к устройствам", "Apache Kafka")
+}
+
+Container(DevicesServiceContainer, "DevicesService") {
+    Boundary(Controllers, "Presentation") {
+        Component(DevicesController, "DevicesController", "REST Controller", "Управление устройствами пользователей, настройка и просмотр состояния")
+    }
+
+    Boundary(Services, "Application") {
+        Component(DevicesService, "DevicesService", "Service", "Содержит бизнес-логику управления устройствами пользователей и их настройки")
+        Component(StatusService, "StatusService", "Service", "Содержит бизнес-логику обработки состояния устройства")
+    }
+
+    Boundary(Contexts, "Persistence") {
+        Component(DevicesRepository, "DevicesRepository", "EF Core DbContext")
+    }
+
+    Boundary(Infrastructure, "Infrastructure") {
+        Component(PreferencesProducer, "PreferencesProducer", "Service", "Публикует события на управление устройствами")
+    }
+}
+
+System_Ext(DevicesAdapter, "DevicesAdapter", ".NET Service")
+System_Ext(MonitoringService, "MonitoringService", ".NET Service")
+
+Rel(DevicesController, DevicesService, "Вызывает")
+Rel(DevicesController, StatusService, "Вызывает")
+
+Rel(DevicesService, DevicesRepository, "Сохраняет/получает данные")
+Rel(DevicesService, PreferencesProducer, "Отправляет события")
+
+Rel(StatusService, DevicesService, "Получает данные")
+Rel(StatusService, MonitoringService, "Получает данные")
+
+Rel(DevicesRepository, DevicesDatabase, "Чтение/запись данных")
+
+Rel(PreferencesProducer, PreferencesQueue, "Публикует события")
+
+Rel(DevicesAdapter, PreferencesQueue, "Читает события")
+
+@enduml
