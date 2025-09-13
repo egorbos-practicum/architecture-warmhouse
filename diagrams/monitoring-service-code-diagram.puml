@@ -1,0 +1,97 @@
+@startuml
+!include <C4/C4_Container>
+
+allow_mixing
+
+title Диаграмма кода MonitoringService
+
+Container_Boundary(MonitoringServiceContainer, "MonitoringService") {
+    class StatusController {
+        + Task<GetRecordsResponse> GetRecordsAsync(GetRecordsRequest)
+        + Task<GetRecordResponse> GetRecordAsync(GetRecordRequest)
+    }
+
+    class MonitoringService {
+        + Task SaveRecordAsync(MonitoringRecord)
+        + Task<ShortMonitoringRecord[]> GetRecordsAsync(GetRecordsRequest)
+        + Task<MonitoringRecord> GetRecordAsync(GetRecordRequest)
+    }
+
+    class MonitoringRepository {
+        + Task<ShortMonitoringRecord[]> FindRecordsAsync(Guid, DateTime, DateTime)
+        + Task<MonitoringRecord> GetRecordAsync(Guid)
+        + Task AddAsync(MonitoringRecord)
+        + Task AddAsync(MonitoringRecord[])
+    }
+
+    class MonitoringConsumer {
+        + Task StartAsync()
+        + Task StopAsync()
+    }
+
+    class GetRecordsRequest {
+        + Guid DeviceId
+        + DateTime StartDate
+        + DateTime EndDate
+    }
+
+    class GetRecordsResponse {
+        + ShortMonitoringRecord[] Records
+    }
+
+    class GetRecordRequest {
+        + Guid RecordId
+    }
+
+    class GetRecordResponse {
+        + MonitoringRecord Record
+    }
+
+    class ShortMonitoringRecord {
+        + DateTime Date
+        + DeviceState State
+        + int EventsCount
+    }
+
+    class MonitoringRecord {
+        + DateTime Date
+        + DeviceState State
+        + DeviceEvent Events
+    }
+
+    class DeviceEvent {
+        + DateTime Date
+        + EventType Type
+        + string Description
+    }
+
+    enum DeviceState {
+        Healthy
+        Unhealthy
+        NotAvailable
+    }
+
+    enum EventType {
+        Reboot
+        PowerDown
+        Alarm
+        CommandReceived
+        CommandExecuted
+        ServiceEvent
+    }
+
+    StatusController --> MonitoringService
+    MonitoringConsumer --> MonitoringService
+    MonitoringService --> MonitoringRepository
+}
+
+    System_Ext(DevicesService, "DevicesService", ".NET Service")
+
+    ContainerDb(MonitoringDatabase, "БД мониторинга", "PostgreSQL", "Данные мониторинга")
+    ContainerQueue(MonitoringQueue, "Очередь записи телеметрии", "Apache Kafka")
+
+    MonitoringService --> DevicesService
+    MonitoringRepository --> MonitoringDatabase
+    MonitoringConsumer --> MonitoringQueue
+
+@enduml

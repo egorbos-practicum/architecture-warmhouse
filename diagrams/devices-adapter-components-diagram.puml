@@ -11,7 +11,7 @@ Container_Boundary(SmartHome, "SmartHome") {
 
 Container(DevicesAdapterContainer, "DevicesAdapter") {
     Boundary(Services, "Application") {
-        Component(DevicesService, "DevicesService", "Service", "Содержит бизнес-логику для управления устройствами")
+        Component(DeviceManagementService, "DeviceManagementService", "Service", "Содержит бизнес-логику для управления устройствами")
         Component(MonitoringService, "MonitoringService", "BackgroundService", "Содержит бизнес-логику для получения от устройств данных телеметрии")
     }
 
@@ -24,12 +24,12 @@ Container(DevicesAdapterContainer, "DevicesAdapter") {
 System_Ext(Devices, "Устройства", "Модули управления и умные устройства")
 
 Rel(MonitoringService, MonitoringProducer, "Отправляет данные телеметрии на запись")
-Rel(PreferencesConsumer, DevicesService, "Отправляет запрос на выполнение команд")
+Rel(PreferencesConsumer, DeviceManagementService, "Отправляет запрос на выполнение команд")
 
 Rel(PreferencesConsumer, PreferencesQueue, "Читает события")
 Rel(MonitoringProducer, MonitoringQueue, "Публикует события")
 
-Rel(DevicesService, Devices, "Отправляет команды")
+Rel(DeviceManagementService, Devices, "Отправляет команды")
 Rel(Devices, MonitoringService, "Отправляет данные телеметрии")
 
 @enduml
