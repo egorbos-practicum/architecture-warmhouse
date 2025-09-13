@@ -11,17 +11,23 @@ Container_Boundary(MonitoringServiceContainer, "MonitoringService") {
         + Task<GetRecordResponse> GetRecordAsync(GetRecordRequest)
     }
 
-    class MonitoringService {
+    interface IMonitoringService {
         + Task SaveRecordAsync(MonitoringRecord)
         + Task<ShortMonitoringRecord[]> GetRecordsAsync(GetRecordsRequest)
         + Task<MonitoringRecord> GetRecordAsync(GetRecordRequest)
     }
 
-    class MonitoringRepository {
+    class MonitoringService {
+    }
+
+    interface IMonitoringRepository {
         + Task<ShortMonitoringRecord[]> FindRecordsAsync(Guid, DateTime, DateTime)
         + Task<MonitoringRecord> GetRecordAsync(Guid)
         + Task AddAsync(MonitoringRecord)
         + Task AddAsync(MonitoringRecord[])
+    }
+
+    class MonitoringRepository {
     }
 
     class MonitoringConsumer {
@@ -80,6 +86,9 @@ Container_Boundary(MonitoringServiceContainer, "MonitoringService") {
         ServiceEvent
     }
 
+    IMonitoringService <|.. MonitoringService
+    IMonitoringRepository <|.. MonitoringRepository
+
     StatusController --> MonitoringService
     MonitoringConsumer --> MonitoringService
     MonitoringService --> MonitoringRepository
@@ -90,8 +99,8 @@ Container_Boundary(MonitoringServiceContainer, "MonitoringService") {
     ContainerDb(MonitoringDatabase, "БД мониторинга", "PostgreSQL", "Данные мониторинга")
     ContainerQueue(MonitoringQueue, "Очередь записи телеметрии", "Apache Kafka")
 
-    MonitoringService --> DevicesService
-    MonitoringRepository --> MonitoringDatabase
-    MonitoringConsumer --> MonitoringQueue
+    MonitoringService ..> DevicesService
+    MonitoringRepository ..> MonitoringDatabase
+    MonitoringConsumer ..> MonitoringQueue
 
 @enduml
