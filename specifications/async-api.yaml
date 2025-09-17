@@ -1,0 +1,171 @@
+asyncapi: 3.0.0
+info:
+  version: 1.0.0
+  title: SmartHome specification
+  description: AsyncApi спецификация микросервисов системы SmartHome
+defaultContentType: application/json
+channels:
+  setConfigQueue:
+    address: smarthome.configuration.v1.event.set
+    messages:
+      setConfigMessage:
+        $ref: '#/components/messages/SetConfigMessage'
+    description: |
+      Очередь для обновления конфигурационных параметров устройств.
+  setConfigResultQueue:
+    address: smarthome.configuration.v1.event.set.result
+    messages:
+      setConfigResultMessage:
+        $ref: '#/components/messages/SetConfigResultMessage'
+    description: |
+      Очередь с результатами обновления конфигурационных параметров устройств.
+  writeTelemetryQueue:
+    address: smarthome.telemetry.v1.event.write
+    messages:
+      writeTelemetryMessage:
+        $ref: '#/components/messages/WriteTelemetryMessage'
+    description: |
+      Очередь для записи телеметрии устройств.
+operations:
+  publishSetConfigMessage:
+    action: send
+    channel:
+      $ref: '#/channels/setConfigQueue'
+    summary: Публикация конфигурационных параметров
+    description: Сервис DevicesService публикует сообщение.
+  consumeSetConfigMessage:
+    action: receive
+    channel:
+      $ref: '#/channels/setConfigQueue'
+    summary: Потребление конфигурационных параметров для применения
+    description: Сервис DevicesAdapter потребляет сообщение.
+  publishSetConfigResultMessage:
+    action: send
+    channel:
+      $ref: '#/channels/setConfigResultQueue'
+    summary: Публикация результата применения конфигурационных параметров
+    description: Сервис DevicesAdapter публикует сообщение.
+  consumeSetConfigResultMessage:
+    action: receive
+    channel:
+      $ref: '#/channels/setConfigResultQueue'
+    summary: Потребление результата применения конфигурационных параметров
+    description: Сервис DevicesService потребляет сообщение.
+  publishWriteTelemetryMessage:
+    action: send
+    channel:
+      $ref: '#/channels/writeTelemetryQueue'
+    summary: Публикация телеметрии для записи в БД
+    description: Сервис DevicesAdapter публикует сообщение.
+  consumeWriteTelemetryMessage:
+    action: receive
+    channel:
+      $ref: '#/channels/writeTelemetryQueue'
+    summary: Потребление телеметрии для записи в БД
+    description: Сервис MonitoringService потребляет сообщение.
+components:
+  messages:
+    SetConfigMessage:
+      name: SetConfigMessage
+      title: Конфигурационные параметры
+      summary: Сообщение с конфигурационными параметрами
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/SetConfigMessagePayload'
+    SetConfigResultMessage:
+      name: SetConfigResultMessage
+      title: Результат применения конфигурационных параметров
+      summary: Сообщение с результатом применения конфигурационных параметров
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/SetConfigResultMessagePayload'
+    WriteTelemetryMessage:
+      name: WriteTelemetryMessage
+      title: Телеметрия устройства
+      summary: Сообщение с телеметрией устройствав
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/WriteTelemetryMessagePayload'
+  schemas:
+    SetConfigMessagePayload:
+      type: object
+      required:
+        - operationId
+        - parameters
+      properties:
+        operationId:
+          type: string
+          format: guid
+          description: Идентификатор операции
+        parameters:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConfigurationParameter'
+          description: Параметры для применения на устройстве
+    ConfigurationParameter:
+      type: object
+      required:
+        - name
+        - value
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+    SetConfigResultMessagePayload:
+      type: object
+      required:
+        - operationId
+        - result
+      properties:
+        operationId:
+          type: string
+          format: guid
+          description: Идентификатор операции
+        result:
+          type: string
+          enum:
+            - 'Successful'
+            - 'Unsuccessful'
+          description: Результат выполнения операции
+    WriteTelemetryMessagePayload:
+      type: object
+      required:
+        - date
+        - state
+        - eventsCount
+      properties:
+        date:
+          type: string
+          format: date-time
+        state:
+          type: string
+          enum:
+            - Healthy
+            - Unhealthy
+            - NotAvailable
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceEvent'
+    DeviceEvent:
+      type: object
+      required:
+        - date
+        - type
+        - description
+      properties:
+        date:
+          type: string
+          format: date-time
+        type:
+          type: string
+          enum:
+            - Reboot
+            - PowerDown
+            - Alarm
+            - CommandReceived
+            - CommandExecuted
+            - ServiceEvent
+        description:
+          type: string

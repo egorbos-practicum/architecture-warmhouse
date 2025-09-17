@@ -6,11 +6,19 @@ entity User {
     + id : uuid <<generated>>
     + username : varchar
     + secret : varchar
+}
+
+entity Profile {
+    + id : uuid <<generated>>
+    + user_id : uuid
+    + full_name: varchar
+    + email : varchar
     + plan : SubscriptionPlan
 }
 
 entity House {
     + id : uuid <<generated>>
+    + name : varchar
     + address : varchar
     + user_id : uuid
 }
@@ -23,6 +31,7 @@ entity Location {
 
 entity Device {
     + id : uuid <<generated>>
+    + serial_number : varchar
     + name : varchar
     + type : DeviceType
     + location_id : uuid
@@ -74,6 +83,7 @@ enum EventType {
     ServiceEvent
 }
 
+User ||--|| Profile : "has"
 User ||--o{ House : "has"
 House ||--o{ Location : "has"
 Location ||--o{ Device : "has"

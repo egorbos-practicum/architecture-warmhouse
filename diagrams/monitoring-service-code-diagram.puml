@@ -54,18 +54,22 @@ Container_Boundary(MonitoringServiceContainer, "MonitoringService") {
     }
 
     class ShortMonitoringRecord {
+        + Guid Id
         + DateTime Date
         + DeviceState State
         + int EventsCount
     }
 
     class MonitoringRecord {
+        + Guid Id
         + DateTime Date
         + DeviceState State
+        + int EventsCount
         + DeviceEvent Events
     }
 
     class DeviceEvent {
+        + Guid Id
         + DateTime Date
         + EventType Type
         + string Description
