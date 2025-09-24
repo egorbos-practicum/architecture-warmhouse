@@ -1,0 +1,28 @@
+@startuml
+!include <C4/C4_Container>
+
+title Диаграмма контейнеров системы
+
+Person(User, "Пользователь", "Пользователь системы")
+
+System_Boundary(SmartHome, "Умный дом") {
+    Container(WebApplication, "Web-приложение", "Web", "Web-интерфейс для клиентов")
+    Container(IosApplication, "Мобильное приложение iOS", "iOS", "iOS приложение для клиентов")
+    Container(AndroidApplication, "Мобильное приложение Android", "Android", "Android приложение для клиентов")
+
+    Container(Backend, "Серверная часть", "Backend", "Обрабатывает бизнес-логику, содержит сервисы и базы данных")
+}
+
+System_Ext(Devices, "Устройства", "Модули управления и умные устройства")
+
+Rel(User, WebApplication, "Использует")
+Rel(User, IosApplication, "Использует")
+Rel(User, AndroidApplication, "Использует")
+
+Rel(WebApplication, Backend, "API")
+Rel(IosApplication, Backend, "API")
+Rel(AndroidApplication, Backend, "API")
+
+Rel(Backend, Devices, "HTTPS/JSON")
+
+@enduml

@@ -1,0 +1,99 @@
+@startuml
+
+title Диаграмма связи сущностей SmartHome
+
+entity User {
+    + id : uuid <<generated>>
+    + username : varchar
+    + secret : varchar
+}
+
+entity Profile {
+    + id : uuid <<generated>>
+    + user_id : uuid
+    + full_name: varchar
+    + email : varchar
+    + plan : SubscriptionPlan
+}
+
+entity UsersToHouses {
+    + user_id : uuid
+    + house_id : uuid
+}
+
+entity House {
+    + id : uuid <<generated>>
+    + name : varchar
+    + address : varchar
+}
+
+entity Location {
+    + id : uuid <<generated>>
+    + name : varchar
+    + home_id : uuid
+}
+
+entity Device {
+    + id : uuid <<generated>>
+    + serial_number : varchar
+    + name : varchar
+    + type : DeviceType
+    + location_id : uuid
+    hub_id : uuid
+}
+
+entity MonitoringRecord {
+    + id : uuid <<generated>>
+    + date : timestamp with time zone
+    + state : DeviceState
+    + events_count : integer
+    + device_id : uuid
+}
+
+entity Event {
+    + id : uuid <<generated>>
+    + date : timestamp with time zone
+    + type : EventType
+    + description : varchar
+}
+
+enum SubscriptionPlan {
+    Basic
+    Advanced
+    Pro
+}
+
+enum DeviceType {
+    Hub
+    Sensor
+    Camera
+    DoorLock
+    Lighting
+    Relay
+}
+
+enum DeviceState {
+    Healthy
+    Unhealthy
+    NotAvailable
+}
+
+enum EventType {
+    Reboot
+    PowerDown
+    Alarm
+    CommandReceived
+    CommandExecuted
+    ServiceEvent
+}
+
+User ||--|| Profile : "has"
+User ||--o{ UsersToHouses : "has"
+House ||--o{ UsersToHouses : "has"
+House ||--o{ Location : "has"
+Location ||--o{ Device : "has"
+Device "id" ||--o{ "hub_id" Device : "manages"
+Device ||--o{ MonitoringRecord : "has"
+MonitoringRecord ||--o{ Event : "has"
+
+@enduml

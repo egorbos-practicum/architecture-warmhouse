@@ -1,0 +1,45 @@
+@startuml
+!include <C4/C4_Component>
+
+title Диаграмма компонентов MonitoringService
+
+Container_Boundary(SmartHome, "SmartHome") {
+    Container(MonitoringServiceContainer, "MonitoringService", "C#, ASP.NET Core", "Мониторинг состояния и показателей устройств")
+    ContainerDb(MonitoringDatabase, "БД мониторинга", "PostgreSQL", "Данные мониторинга")
+    ContainerQueue(MonitoringQueue, "Очередь записи телеметрии", "Apache Kafka")
+}
+
+Container(MonitoringServiceContainer, "MonitoringService") {
+    Boundary(Controllers, "Presentation") {
+        Component(StatusController, "StatusController", "REST Controller", "Просмотр состояния и показателей устройств")
+    }
+
+    Boundary(Services, "Application") {
+        Component(MonitoringService, "MonitoringService", "Service", "Содержит бизнес-логику обработки телеметрических данных устройств")
+    }
+
+    Boundary(Contexts, "Persistence") {
+        Component(MonitoringRepository, "MonitoringRepository", "EF Core DbContext")
+    }
+
+    Boundary(Infrastructure, "Infrastructure") {
+        Component(MonitoringConsumer, "MonitoringConsumer", "BackgroundService", "Читает события на запись в БД данных телеметрии устройств")
+    }
+}
+
+System_Ext(DevicesAdapter, "DevicesAdapter", ".NET Service")
+System_Ext(DevicesService, "DevicesService", ".NET Service")
+
+Rel(StatusController, MonitoringService, "Вызывает")
+
+Rel(MonitoringService, MonitoringRepository, "Сохраняет/получает данные")
+Rel(MonitoringService, DevicesService, "Получает данные")
+
+Rel(MonitoringRepository, MonitoringDatabase, "Чтение/запись данных")
+
+Rel(MonitoringConsumer, MonitoringQueue, "Читает события")
+Rel(MonitoringConsumer, MonitoringService, "Направляет данные для обработки")
+
+Rel(DevicesAdapter, MonitoringQueue, "Публикует события")
+
+@enduml

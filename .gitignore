@@ -189,6 +189,12 @@ build/
 ### Mac OS ###
 .DS_Store
 
+### .NET ###
+bin/
+obj/
+
+### JetBrains Rider ###
+*.user
 
 tmp/
 task-*

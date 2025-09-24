@@ -1,0 +1,53 @@
+@startuml
+!include <C4/C4_Container>
+
+title Диаграмма контейнеров Backend
+
+Container(WebApplication, "Web-App", "JavaScript", "Приложение пользователя SmartHome")
+Container(IosApplication, "iOS-App", "Swift", "Приложение пользователя SmartHome")
+Container(AndroidApplication, "Android-App", "Kotlin", "Приложение пользователя SmartHome")
+
+System_Boundary(Backend, "Backend") {
+    Container(ApiGateway, "Точка входа Api-шлюз", ".NET Service", "Маршрутизация запросов")
+
+    Container(UsersService, "Сервис пользователей", ".NET Service", "Управление пользователями системы")
+    Container(DevicesService, "Сервис устройств", ".NET Service", "Управление устройствами пользователей, настройка и просмотр состояния")
+    Container(MonitoringService, "Сервис мониторинга", ".NET Service", "Мониторинг состояния и показателей устройств")
+
+    ContainerDb(UsersDatabase, "БД пользователей", "PostgreSQL", "Данные пользователя и данные об авторизации пользователей")
+    ContainerDb(DevicesDatabase, "БД устройств", "PostgreSQL", "Умные устройства")
+    ContainerDb(MonitoringDatabase, "БД мониторинга", "PostgreSQL", "Данные мониторинга")
+
+    ContainerQueue(PreferencesQueue, "Очередь запросов к устройствам", "Apache Kafka")
+    ContainerQueue(MonitoringQueue, "Очередь записи телеметрии", "Apache Kafka")
+
+    Container(DevicesAdapter, "Сервис-адаптер", ".NET Service", "Сервис для связи с устройствами")
+}
+
+System_Ext(Devices, "Устройства", "Модули управления и умные устройства")
+
+Rel(WebApplication, ApiGateway, "Вызывает", "REST API")
+Rel(IosApplication, ApiGateway, "Вызывает", "REST API")
+Rel(AndroidApplication, ApiGateway, "Вызывает", "REST API")
+
+Rel(ApiGateway, UsersService, "REST API")
+Rel(ApiGateway, DevicesService, "REST API")
+
+Rel(DevicesService, UsersService, "Получение данных о пользователе", "HTTPS/JSON")
+Rel(DevicesService, MonitoringService, "Получение данных о телеметрии", "HTTPS/JSON")
+Rel(MonitoringService, DevicesService, "Получение данных об устройстве", "HTTPS/JSON")
+
+Rel(UsersService, UsersDatabase, "Получение и запись данных", "SQL")
+Rel(DevicesService, DevicesDatabase, "Получение и запись данных", "SQL")
+Rel(MonitoringService, MonitoringDatabase, "Получение и запись данных", "SQL")
+
+Rel(DevicesService, PreferencesQueue, "Добавление, удаление, настройка устройств", "REST API")
+Rel(MonitoringQueue, MonitoringService, "Запись данных телеметрии в БД", "REST API")
+
+Rel(PreferencesQueue, DevicesAdapter, "Добавление, удаление, настройка устройств", "REST API")
+Rel(DevicesAdapter, MonitoringQueue, "Запись данных телеметрии в БД", "REST API")
+
+Rel(DevicesAdapter, Devices, "Отправка управляющих команд", "HTTPS/MQTT/CoAP/DDS")
+Rel(Devices, DevicesAdapter, "Отправка данных телеметрии", "HTTPS/MQTT/CoAP/DDS")
+
+@enduml
