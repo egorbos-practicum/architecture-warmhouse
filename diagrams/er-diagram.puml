@@ -16,11 +16,15 @@ entity Profile {
     + plan : SubscriptionPlan
 }
 
+entity UsersToHouses {
+    + user_id : uuid
+    + house_id : uuid
+}
+
 entity House {
     + id : uuid <<generated>>
     + name : varchar
     + address : varchar
-    + user_id : uuid
 }
 
 entity Location {
@@ -84,7 +88,8 @@ enum EventType {
 }
 
 User ||--|| Profile : "has"
-User ||--o{ House : "has"
+User ||--o{ UsersToHouses : "has"
+House ||--o{ UsersToHouses : "has"
 House ||--o{ Location : "has"
 Location ||--o{ Device : "has"
 Device "id" ||--o{ "hub_id" Device : "manages"

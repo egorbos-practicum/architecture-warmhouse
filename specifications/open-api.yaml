@@ -4,7 +4,7 @@ info:
   title: SmartHome specification
   description: OpenAPI спецификация микросервисов системы SmartHome
 paths:
-  "/users":
+  "/api/v1/users":
     post:
       tags:
         - UsersService
@@ -46,7 +46,7 @@ paths:
           description: OK
         '401':
           description: Unauthorized
-  /auth:
+  /api/v1/auth:
     post:
       tags:
         - UsersService
@@ -66,7 +66,7 @@ paths:
                 $ref: '#/components/schemas/AuthResponse'
         '401':
           description: Unauthorized
-  /auth/refresh:
+  /api/v1/auth/refresh:
     post:
       tags:
         - UsersService
@@ -80,7 +80,7 @@ paths:
                 $ref: '#/components/schemas/AuthResponse'
         '401':
           description: Unauthorized
-  /profile:
+  /api/v1/profile:
     get:
       tags:
         - UsersService
@@ -113,7 +113,7 @@ paths:
           description: OK
         '401':
           description: Unauthorized
-  /profile/plan:
+  /api/v1/profile/plan:
     post:
       tags:
         - UsersService
@@ -131,7 +131,7 @@ paths:
           description: OK
         '401':
           description: Unauthorized
-  /profile/houses:
+  /api/v1/profile/houses:
     get:
       tags:
         - UsersService
@@ -170,7 +170,7 @@ paths:
           description: Тарифный план не позволяет добавить дом (количество исчерпано)
         '401':
           description: Unauthorized
-  /profile/houses/{houseId}:
+  /api/v1/profile/houses/{houseId}:
     patch:
       tags:
         - UsersService
@@ -196,7 +196,7 @@ paths:
           description: OK
         '401':
           description: Unauthorized
-  /profile/houses/{houseId}/locations:
+  /api/v1/profile/houses/{houseId}/locations:
     post:
       tags:
         - UsersService
@@ -226,7 +226,7 @@ paths:
                 $ref: '#/components/schemas/AddLocationResponse'
         '401':
           description: Unauthorized
-  /profile/houses/{houseId}/locations/{locationId}:
+  /api/v1/profile/houses/{houseId}/locations/{locationId}:
     patch:
       tags:
         - UsersService
@@ -285,7 +285,7 @@ paths:
           description: OK
         '401':
           description: Unauthorized
-  /devices:
+  /api/v1/devices:
     post:
       tags:
         - DevicesService
@@ -335,7 +335,7 @@ paths:
                 $ref: '#/components/schemas/GetDevicesResponse'
         '401':
           description: Unauthorized
-  /devices/{deviceId}:
+  /api/v1/devices/{deviceId}:
     patch:
       tags:
         - DevicesService
@@ -361,7 +361,7 @@ paths:
           description: OK
         '401':
           description: Unauthorized
-  /devices/{deviceId}/parameters:
+  /api/v1/devices/{deviceId}/parameters:
     get:
       tags:
         - DevicesService
@@ -410,7 +410,7 @@ paths:
           description: OK
         '401':
           description: Unauthorized
-  /devices/{deviceId}/monitoring-records:
+  /api/v1/devices/{deviceId}/monitoring-records:
     get:
       tags:
         - DevicesService
@@ -451,7 +451,7 @@ paths:
                 $ref: '#/components/schemas/GetRecordsResponse'
         '401':
           description: Unauthorized
-  /devices/{deviceId}/monitoring-records/{recordId}:
+  /api/v1/devices/{deviceId}/monitoring-records/{recordId}:
     get:
       tags:
         - DevicesService
@@ -483,7 +483,7 @@ paths:
                 $ref: '#/components/schemas/GetRecordResponse'
         '401':
           description: Unauthorized
-  /records:
+  /api/v1/records:
     get:
       tags:
         - MonitoringService
@@ -520,7 +520,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetRecordsResponse'
-  /records/{recordId}:
+  /api/v1/records/{recordId}:
     get:
       tags:
         - MonitoringService
